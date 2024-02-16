@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from scapy.all import * # do not import from scapy.util, that rdcap version has bugs
+from scapy.all import * # do not import from scapy.util, that rdpcap version has bugs
 
 
 class PacketSniffer():
