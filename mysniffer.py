@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from scapy.all import rdpcap # do not import from scapy.util, that rdcap version has bugs
+from scapy.all import * # do not import from scapy.util, that rdcap version has bugs
 
 
 class PacketSniffer():
@@ -10,13 +10,17 @@ class PacketSniffer():
 
     def read_pcap_file(self):
         print("Reading file name : " + self.pcap_file[0])
-        packet_list = rdpcap(self.pcap_file[0])
+        packet_list = sniff(offline=self.pcap_file[0], filter=self.bpf_filter)
         print(packet_list)
 
+    def prepare_expression(self):
+        self.bpf_filter = ' '.join(self.expression)
+
     def sniff_interface(self):
-        print("Sniffing interface " + self.interface[0])
+        print("Sniffing interface " + self.interface)
 
     def start(self):
+        self.prepare_expression()
         if self.interface is not None:
             self.sniff_interface()
         elif self.pcap_file is not None:
