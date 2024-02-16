@@ -4,6 +4,7 @@ from scapy.all import * # do not import from scapy.util, that rdpcap version has
 
 class PacketSniffer():
     def __init__(self, interface, pcap_file, expression):
+        self.bpf_filter = None
         self.interface = interface
         self.pcap_file = pcap_file
         self.expression = expression
