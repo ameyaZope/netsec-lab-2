@@ -8,10 +8,6 @@ from scapy.all import *  # do not import from scapy.util, that rdpcap version ha
 from scapy.layers.http import HTTPRequest, HTTP
 from scapy.layers.inet import TCP, IP
 from scapy.layers.tls.all import TLS, ServerName
-from scapy.layers.tls.extensions import TLS_Ext_SupportedVersions, TLS_Ext_SupportedVersion_CH, \
-    TLS_Ext_SupportedVersion_SH
-from scapy.layers.tls.handshake import TLSClientHello, TLSServerHello, TLS13ClientHello
-from scapy.layers.tls.record_tls13 import TLS13
 
 
 def display_single_packet(pkt):
@@ -31,22 +27,13 @@ def display_single_packet(pkt):
         0xfeff: "DTLS_1_0",  # 65279
         0xfefd: "DTLS_1_1",  # 65277
     }
-    if pkt.haslayer(TLS):
-        print("TLS v1.3 found")
     if pkt.haslayer(HTTPRequest):
         print(
             f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTP].Host.decode("UTF-8")} {pkt[HTTP].Method.decode("UTF-8")} {pkt[HTTP].Path.decode("UTF-8")}')
     elif pkt.haslayer(TLS):
-        tls_version = None
-        if pkt.haslayer(TLS_Ext_SupportedVersion_CH):
-            for version in pkt[TLS_Ext_SupportedVersion_CH].versions:
-                if version == 772 and pkt[TLSClientHello].version == 771:
-                    tls_version = "v1.3"
-        if tls_version is None and pkt.haslayer(TLSClientHello):
-            tls_version = TLS_VERSIONS[pkt[TLSClientHello].version]
         if pkt.haslayer(ServerName):
             print(
-                f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {tls_version} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
+                f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLS].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
         else:
             print(
                 f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLS].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
