@@ -8,6 +8,9 @@ from scapy.all import *  # do not import from scapy.util, that rdpcap version ha
 from scapy.layers.http import HTTPRequest, HTTP
 from scapy.layers.inet import TCP, IP
 from scapy.layers.tls.all import TLS, ServerName
+from scapy.layers.tls.extensions import TLS_Ext_SupportedVersion_SH, TLS_Ext_SupportedVersions, \
+    TLS_Ext_SupportedVersion_CH
+from scapy.layers.tls.handshake import TLSClientHello, TLS13ClientHello
 
 
 def display_single_packet(pkt):
@@ -27,16 +30,24 @@ def display_single_packet(pkt):
         0xfeff: "DTLS_1_0",  # 65279
         0xfefd: "DTLS_1_1",  # 65277
     }
-    if pkt.haslayer(HTTPRequest):
-        print(
-            f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTP].Host.decode("UTF-8")} {pkt[HTTP].Method.decode("UTF-8")} {pkt[HTTP].Path.decode("UTF-8")}')
-    elif pkt.haslayer(TLS):
-        if pkt.haslayer(ServerName):
+    if pkt.haslayer(IP):
+        if pkt.haslayer(HTTPRequest):
             print(
-                f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLS].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
-        else:
-            print(
-                f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLS].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
+                f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTP].Host.decode()} {pkt[HTTP].Method.decode()} {pkt[HTTP].Path.decode()}')
+        elif pkt.haslayer(TLS) and pkt[TLSClientHello].version==771 and pkt.haslayer(TLS_Ext_SupportedVersion_CH) and 772 in pkt[TLS_Ext_SupportedVersion_CH].versions:
+            if pkt.haslayer(ServerName):
+                print(
+                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS 1.3 {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode()}')
+            else:
+                print(
+                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS 1.3 {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
+        elif pkt.haslayer(TLSClientHello):
+            if pkt.haslayer(ServerName):
+                print(
+                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
+            else:
+                print(
+                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
 
 
 def display_packets(packet_list: list):
@@ -70,14 +81,16 @@ class PacketSniffer():
         elif self.pcap_file is not None:
             self.read_pcap_file()
         else:
-            print('You must either provide the -i argument or -r argument. Exiting')
+            print('You must either provide the -i argument or -r argument. Check -h for help. Exiting')
 
 
 if __name__ == '__main__':
     load_layer('tls')
     parser = ArgumentParser(prog='Packet Sniffer',
                             description='Simple packet sniffer for HTTP and TLS traffic',
-                            epilog="For more help contact Ameya Zope")
+                            epilog="You can choose either one of -i or -r options. At least one of the two options is "
+                                   "compulsory. The program will terminate if both the arguments are not provided. "
+                                   "For more help contact Ameya Zope")
     # TODO: Add error handling for invalid input
     parser.add_argument('-i', '--interface', dest='interface', nargs=1, type=str, action='store', default=None,
                         help='Specify the network interface that needs to be sniffed')
