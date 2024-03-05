@@ -34,7 +34,7 @@ def display_single_packet(pkt):
         if pkt.haslayer(HTTPRequest):
             print(
                 f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTP].Host.decode()} {pkt[HTTP].Method.decode()} {pkt[HTTP].Path.decode()}')
-        elif pkt.haslayer(TLS) and pkt[TLSClientHello].version==771 and pkt.haslayer(TLS_Ext_SupportedVersion_CH) and 772 in pkt[TLS_Ext_SupportedVersion_CH].versions:
+        elif pkt.haslayer(TLSClientHello) and pkt[TLSClientHello].version==771 and pkt.haslayer(TLS_Ext_SupportedVersion_CH) and 772 in pkt[TLS_Ext_SupportedVersion_CH].versions:
             if pkt.haslayer(ServerName):
                 print(
                     f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS 1.3 {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode()}')
