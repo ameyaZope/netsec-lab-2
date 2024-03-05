@@ -31,7 +31,8 @@ def display_single_packet(pkt):
         0xfefd: "DTLS_1_1",  # 65277
     }
     if pkt.haslayer(IP):
-        if pkt.haslayer(HTTPRequest):
+        if pkt.haslayer(HTTPRequest) and pkt[HTTPRequest].Method.decode() in ['GET', 'POST']:
+            print()
             print(
                 f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTP].Host.decode()} {pkt[HTTP].Method.decode()} {pkt[HTTP].Path.decode()}')
         elif pkt.haslayer(TLSClientHello) and pkt[TLSClientHello].version==771 and pkt.haslayer(TLS_Ext_SupportedVersion_CH) and 772 in pkt[TLS_Ext_SupportedVersion_CH].versions:
