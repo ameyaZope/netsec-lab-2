@@ -3,8 +3,4 @@ venv
 # Coding Environement Variables
 .idea
 
-# Homework Question Files
-hw2.pcap
-hw2.txt
-
 .DS_Store
