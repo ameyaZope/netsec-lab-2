@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from argparse import ArgumentParser
-from pprint import pprint
 from time import localtime, strftime
 
 from scapy.all import *  # do not import from scapy.util, that rdpcap version has bugs
