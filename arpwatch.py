@@ -15,12 +15,9 @@ def get_arp_table():
         names = [
             'IP address', 'HW type', 'Flags', 'HW address', 'Mask', 'Device'
         ]  # arp 1.88, net-tools 1.60
-
         reader = csv.DictReader(
             arpt, fieldnames=names, skipinitialspace=True, delimiter=' ')
-
-        next(reader)  # Skip header.
-
+        next(reader)
         return [block for block in reader]
 
 
@@ -32,9 +29,9 @@ class ArpWatch:
         if ARP in pkt and pkt[ARP].op == 2:  # who-has or is-at
             for arp_entry in get_arp_table():
                 if arp_entry['IP address'] == pkt[ARP].psrc and arp_entry['HW address'] != pkt[ARP].hwsrc:
-                    return pkt.sprintf('ARP Changing from initialMac : ' + str(
-                        arp_entry['HW address'] + ' newMac: ' + str(pkt[ARP].hwsrc) + ' for ip: ' + arp_entry[
-                            'IP address']))
+                    return pkt.sprintf(f'[WARNING] {datetime.now().strftime("%d/%m/%Y %H:%M:%S")} ARP Cache Poisoning '
+                                       'Detected ARP Changing from initialMac : ' + str(arp_entry['HW address'] +
+                                       'newMac: ' + str(pkt[ARP].hwsrc) + ' for ip: ' + arp_entry['IP address']))
 
     def start_arp_poisoning_detector(self):
         sniff(iface=self.interface, prn=self.detect_arp_poisoning, filter="arp", store=0)
