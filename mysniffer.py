@@ -7,10 +7,7 @@ from scapy.all import *  # do not import from scapy.util, that rdpcap version ha
 from scapy.layers.http import HTTPRequest, HTTP
 from scapy.layers.inet import TCP, IP
 from scapy.layers.tls.all import TLS, ServerName
-from scapy.layers.tls.extensions import TLS_Ext_SupportedVersion_SH, TLS_Ext_SupportedVersions, \
-    TLS_Ext_SupportedVersion_CH
-from scapy.layers.tls.handshake import TLSClientHello, TLS13ClientHello
-import re
+from scapy.layers.tls.handshake import TLSClientHello
 
 
 def display_single_packet(pkt):
@@ -32,16 +29,69 @@ def display_single_packet(pkt):
     }
     if pkt.haslayer(IP):
         if pkt.haslayer(HTTPRequest) and pkt[HTTPRequest].Method.decode() in ['GET', 'POST']:
-            print()
             print(
-                f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTP].Host.decode()} {pkt[HTTP].Method.decode()} {pkt[HTTP].Path.decode()}')
-        elif pkt.haslayer(TLSClientHello):
+                f'{strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTPRequest].Host.decode()} {pkt[HTTPRequest].Method.decode()} {pkt[HTTPRequest].Path.decode()}')
+        elif pkt.haslayer(Raw) and pkt.haslayer(TCP):
+            payload = pkt[TCP][Raw].load.decode('utf-8', 'ignore')
+
+            if payload.startswith('GET') or payload.startswith('POST'):
+                # print(pkt[Raw].load.decode('utf-8', 'ignore'))  # This line works
+                lines = payload.split('\r\n')
+
+                first_line = lines[0].split()
+                method = first_line[0]  # Method: GET or POST
+                uri = first_line[1] if len(first_line) > 1 else 'Unknown URI'
+
+                host = 'Unknown Host'
+                for line in lines:
+                    if line.startswith('Host:'):
+                        host = line.split('Host: ')[1]
+                        break
+                if method in ['GET', 'POST'] and host != 'Unknown Host':
+                    print(
+                        f'{strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {host} {method} {uri}')
+        if pkt.haslayer(TLSClientHello):
             if pkt.haslayer(ServerName):
                 print(
-                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
+                    f'[normal] {strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
             else:
                 print(
-                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(pkt.time))}.{pkt.time - int(pkt.time)} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
+                    f'[normal] {strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
+        elif pkt.haslayer(TCP) and pkt[TCP].payload and pkt.haslayer(Raw):
+            tcp_payload = bytes(pkt[TCP].payload)
+            if len(tcp_payload) > 10:
+                # Extract the first byte for the Content Type
+                content_type = tcp_payload[0]
+                tls_version_major, tls_version_minor = tcp_payload[9], tcp_payload[10]
+                # Map major.minor bytes to human-readable version
+                version_mapping = {
+                    (3, 0): "SSL 3.0",
+                    (3, 1): "TLS 1.0",
+                    (3, 2): "TLS 1.1",
+                    (3, 3): "TLS 1.2",
+                    (3, 4): "TLS 1.3",
+                }
+                readable_version = version_mapping.get((tls_version_major, tls_version_minor))
+                if content_type == 22 and tcp_payload[5] == 1:
+                    cipher_suites_length = int.from_bytes(tcp_payload[76:78], byteorder="big")
+                    compression_methods_length = int.from_bytes(
+                        tcp_payload[78 + cipher_suites_length:79 + cipher_suites_length],
+                        byteorder="big")  # 80 = 77 + 2 + 1
+                    extensions_length = int.from_bytes(tcp_payload[
+                                                       79 + cipher_suites_length + compression_methods_length: 81 + cipher_suites_length + compression_methods_length],
+                                                       byteorder="big")
+                    sni_value = ""
+                    curr_byte = 81 + cipher_suites_length + compression_methods_length
+                    while curr_byte < 81 + cipher_suites_length + compression_methods_length + extensions_length:
+                        ext_type = int.from_bytes(tcp_payload[curr_byte: curr_byte + 2], byteorder="big")
+                        ext_len = int.from_bytes(tcp_payload[curr_byte + 2: curr_byte + 4], byteorder="big")
+                        ext_val = tcp_payload[curr_byte + 4: curr_byte + 4 + ext_len]
+                        if ext_type == 0 and ext_len > 5:
+                            sni_len = ext_len
+                            sni_value = ext_val[5:].decode()
+                        curr_byte = curr_byte + 4 + ext_len
+                    print(
+                        f'[Payload] {strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} {readable_version} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {sni_value}')
 
 
 def display_packets(packet_list: list):
