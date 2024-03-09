@@ -8,6 +8,16 @@ from scapy.layers.http import HTTPRequest, HTTP
 from scapy.layers.inet import TCP, IP
 from scapy.layers.tls.all import TLS, ServerName
 from scapy.layers.tls.handshake import TLSClientHello
+from scapy.all import conf
+
+
+def get_interface(interface):
+    if interface is not None:
+        return interface[0]
+    try:
+        return conf.iface
+    except AttributeError:
+        print('Unable to use default interface. Exiting')
 
 
 def display_single_packet(pkt):
@@ -53,10 +63,10 @@ def display_single_packet(pkt):
         if pkt.haslayer(TLSClientHello):
             if pkt.haslayer(ServerName):
                 print(
-                    f'[normal] {strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
+                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
             else:
                 print(
-                    f'[normal] {strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
+                    f'{strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
         elif pkt.haslayer(TCP) and pkt[TCP].payload and pkt.haslayer(Raw):
             tcp_payload = bytes(pkt[TCP].payload)
             if len(tcp_payload) > 10:
@@ -91,7 +101,7 @@ def display_single_packet(pkt):
                             sni_value = ext_val[5:].decode()
                         curr_byte = curr_byte + 4 + ext_len
                     print(
-                        f'[Payload] {strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} {readable_version} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {sni_value}')
+                        f'{strftime("%Y-%m-%d %H:%M:%S", localtime(float(pkt.time)))}.{float(pkt.time) - int(float(pkt.time))} {readable_version} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {sni_value}')
 
 
 def display_packets(packet_list: list):
@@ -115,34 +125,35 @@ class PacketSniffer():
         self.bpf_filter = ' '.join(self.expression)
 
     def sniff_interface(self):
-        print("Sniffing interface " + self.interface[0])
-        sniff(iface=self.interface[0], filter=self.bpf_filter, prn=lambda pkt: display_single_packet(pkt))
+        print("Sniffing interface " + self.interface)
+        sniff(iface=self.interface, filter=self.bpf_filter, prn=lambda pkt: display_single_packet(pkt))
 
     def start(self):
         self.prepare_expression()
-        if self.interface is not None:
-            self.sniff_interface()
-        elif self.pcap_file is not None:
+        if self.pcap_file is not None:
             self.read_pcap_file()
+        elif self.interface is not None:
+            self.sniff_interface()
         else:
-            print('You must either provide the -i argument or -r argument. Check -h for help. Exiting')
+            print('Could not load interface or pcap file.  Check -h for help. Exiting')
 
 
 if __name__ == '__main__':
     load_layer('tls')
     parser = ArgumentParser(prog='Packet Sniffer',
                             description='Simple packet sniffer for HTTP and TLS traffic',
-                            epilog="You can choose either one of -i or -r options. At least one of the two options is "
-                                   "compulsory. The program will terminate if both the arguments are not provided. "
+                            epilog="You can choose either one of -i or -r options. If both are not specified, "
+                                   "this program will start sniffing on the default interface"
                                    "For more help contact Ameya Zope")
     # TODO: Add error handling for invalid input
     parser.add_argument('-i', '--interface', dest='interface', nargs=1, type=str, action='store', default=None,
-                        help='Specify the network interface that needs to be sniffed')
+                        help='Specify the network interface that needs to be sniffed, if not specified and the -r '
+                             'option is also not specified, then it picks up the default interface')
     # TODO : Add error handling for file not found
     parser.add_argument('-r', '--read', dest='pcap_file', nargs=1, type=str, action='store', default=None,
                         help='Specify the pcap file to read the packets from')
     parser.add_argument("expression", nargs='*', type=str, action="store", default=None,
                         help='This is the bpf filter that will be applied to the packets captured')
     args = parser.parse_args()
-    pktSniffer = PacketSniffer(args.interface, args.pcap_file, args.expression)
+    pktSniffer = PacketSniffer(get_interface(args.interface), args.pcap_file, args.expression)
     pktSniffer.start()
