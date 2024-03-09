@@ -22,21 +22,14 @@ sudo ./mysniffer.py -r hw2.pcap
 <img src="./mysniffer_read_pcap_file.png" alt="mysniffer_read_pcap_file.png">
 
 
-#### [mysniffer.py]
-1. Simple GET Request
-```bash
+#### [mysniffer.py] POST Requests
 
-```
+<img src="./mysniffer_post_request.png" alt="mysniffer_post_request.png">
 
-2. Simple POST Request
-```bash
+#### [mysniffer.py] BPF Filter
+<img src="./mysniffer_bpf_filter.png" alt="mysniffer_bpf_filter.png">
 
-```
 
-3. 404 Not Found 
-```bash
-
-```
 
 ### Testing
 #### [mysniffer.py] Different Versions of TLS on standard port
