@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 
 import csv
+import subprocess
 
 from argparse import ArgumentParser
 from scapy.all import *
 from scapy.layers.l2 import ARP
+from scapy.all import conf
+
+
+def get_interface(interface):
+    if interface is not None:
+        return interface[0]
+    try:
+        return conf.iface
+    except AttributeError:
+        print('Unable to use default interface. Exiting')
 
 
 def get_arp_table():
@@ -31,14 +42,15 @@ class ArpWatch:
                 if arp_entry['IP address'] == pkt[ARP].psrc and arp_entry['HW address'] != pkt[ARP].hwsrc:
                     return pkt.sprintf(f'[WARNING] {datetime.now().strftime("%d/%m/%Y %H:%M:%S")} ARP Cache Poisoning '
                                        'Detected ARP Changing from initialMac : ' + str(arp_entry['HW address'] +
-                                       ' newMac: ' + str(pkt[ARP].hwsrc) + ' for ip: ' + arp_entry['IP address']))
+                                                                                        ' newMac: ' + str(
+                        pkt[ARP].hwsrc) + ' for ip: ' + arp_entry['IP address']))
 
     def start_arp_poisoning_detector(self):
         if self.interface is not None:
             print("Starting ARP-Watch for arp-cache-poisoning detection")
             sniff(iface=self.interface, prn=self.detect_arp_poisoning, filter="arp", store=0)
         else:
-            print("You must provide an interface for monitoring. Check -h for help. Exiting")
+            sniff(iface=self.interface, prn=self.detect_arp_poisoning, filter="arp", store=0)
 
 
 if __name__ == '__main__':
@@ -48,8 +60,9 @@ if __name__ == '__main__':
 
     # TODO: Add error handling for invalid input
     parser.add_argument('-i', '--interface', dest='interface', nargs=1, type=str, action='store', default=None,
-                        help='Specify the network interface that needs to be sniffed')
+                        help='Specify the network interface that needs to be sniffed, if not specified it will pick '
+                             'the default interface')
 
     args = parser.parse_args()
-    arpWatch = ArpWatch(interface=args.interface)
+    arpWatch = ArpWatch(interface=get_interface(args.interface))
     arpWatch.start_arp_poisoning_detector()
