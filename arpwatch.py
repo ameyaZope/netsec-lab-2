@@ -31,7 +31,7 @@ class ArpWatch:
                 if arp_entry['IP address'] == pkt[ARP].psrc and arp_entry['HW address'] != pkt[ARP].hwsrc:
                     return pkt.sprintf(f'[WARNING] {datetime.now().strftime("%d/%m/%Y %H:%M:%S")} ARP Cache Poisoning '
                                        'Detected ARP Changing from initialMac : ' + str(arp_entry['HW address'] +
-                                       'newMac: ' + str(pkt[ARP].hwsrc) + ' for ip: ' + arp_entry['IP address']))
+                                       ' newMac: ' + str(pkt[ARP].hwsrc) + ' for ip: ' + arp_entry['IP address']))
 
     def start_arp_poisoning_detector(self):
         if self.interface is not None:
