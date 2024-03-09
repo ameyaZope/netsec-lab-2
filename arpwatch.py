@@ -34,7 +34,11 @@ class ArpWatch:
                                        'newMac: ' + str(pkt[ARP].hwsrc) + ' for ip: ' + arp_entry['IP address']))
 
     def start_arp_poisoning_detector(self):
-        sniff(iface=self.interface, prn=self.detect_arp_poisoning, filter="arp", store=0)
+        if self.interface is not None:
+            print("Starting ARP-Watch for arp-cache-poisoning detection")
+            sniff(iface=self.interface, prn=self.detect_arp_poisoning, filter="arp", store=0)
+        else:
+            print("You must provide an interface for monitoring. Check -h for help. Exiting")
 
 
 if __name__ == '__main__':
