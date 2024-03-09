@@ -132,12 +132,15 @@ The arpwatch.py script will detect if there is an ongoing arp spoof attack on th
 The attacker will launch full man in the middle attack using arpspoof command installed on ubuntu
 
 Attacker IP Address : 10.0.2.15
+
 Victim IP Address : 10.0.2.4
+
 Gateway IP Address : 10.0.2.1
 
-Attacker will have 3 termainls
+Attacker will have 3 terminals
 
 ***Attacker Terminal 1***
+
 ```bash
 sudo arpspoof -i enp0s3 -t 10.0.2.4 10.0.2.1
 ```
@@ -145,6 +148,7 @@ sudo arpspoof -i enp0s3 -t 10.0.2.4 10.0.2.1
 <img src="./attacker_terminal_1.png" alt="attacker_terminal_1.png">
 
 ***Attacker Terminal 2***
+
 ```bash
 sudo arpspoof -i enp0s3 -t 10.0.2.1 10.0.2.4
 ```
@@ -153,6 +157,7 @@ sudo arpspoof -i enp0s3 -t 10.0.2.1 10.0.2.4
 
 
 ***Attacker Terminal 3***
+
 The below is assuming that the attacker only wants to sniff icmp packets. 
 This terminal is used only for demo purposes. This is one of the most interesting images of this 
 documentation. Here we are sniffing the network packets arriving at the attacker's machine. 
@@ -175,6 +180,7 @@ sudo systctl -w net.ipv4.ip_forward=1
 Victim will have 1 termainl open
 
 ***Victim Terminal 1***
+
 ```bash
 sudo ./arpwatch.py -i eth0
 ```
@@ -184,6 +190,7 @@ arp spoofing attacks.
 
 
 ***Victim Terminal 2***
+
 This is used to generate icmp packets for demo purposes
 ```bash
 ping 8.8.8.8
