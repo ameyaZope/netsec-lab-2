@@ -115,6 +115,7 @@ This script is an ARP Cache Poisoning Detector that uses the Scapy library to mo
 sudo ./arpwatch.py -i eth0
 
 # [arpwatch.py] With Default Interface
+sudo ./arpwatch.py
 
 Let me explain the attacker and victim situation.
 There is one attacker machine(ubuntu machine) and one victim machine (kali-linux machine).
