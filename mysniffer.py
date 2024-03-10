@@ -40,7 +40,7 @@ def display_single_packet(pkt):
     if pkt.haslayer(IP):
         if pkt.haslayer(HTTPRequest) and pkt[HTTPRequest].Method.decode() in ['GET', 'POST']:
             print(
-                f'{datetime.fromtimestamp(pkt.time).strftime("%Y-%m-%d %H:%M:%S.{:06d}".format(int((pkt.time - int(pkt.time)) * 1_000_000)))} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTPRequest].Host.decode()} {pkt[HTTPRequest].Method.decode()} {pkt[HTTPRequest].Path.decode()}')
+                f'{datetime.fromtimestamp(int(pkt.time)).strftime("%Y-%m-%d %H:%M:%S")}.{int((pkt.time - int(pkt.time)) * 1_000_000):06d} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[HTTPRequest].Host.decode()} {pkt[HTTPRequest].Method.decode()} {pkt[HTTPRequest].Path.decode()}')
         elif pkt.haslayer(Raw) and pkt.haslayer(TCP):
             payload = pkt[TCP][Raw].load.decode('utf-8', 'ignore')
 
@@ -59,14 +59,14 @@ def display_single_packet(pkt):
                         break
                 if method in ['GET', 'POST'] and host != 'Unknown Host':
                     print(
-                        f'{datetime.fromtimestamp(pkt.time).strftime("%Y-%m-%d %H:%M:%S.{:06d}".format(int((pkt.time - int(pkt.time)) * 1_000_000)))} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {host} {method} {uri}')
+                        f'{datetime.fromtimestamp(int(pkt.time)).strftime("%Y-%m-%d %H:%M:%S")}.{int((pkt.time - int(pkt.time)) * 1_000_000):06d} HTTP {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {host} {method} {uri}')
         if pkt.haslayer(TLSClientHello):
             if pkt.haslayer(ServerName):
                 print(
-                    f'{datetime.fromtimestamp(pkt.time).strftime("%Y-%m-%d %H:%M:%S.{:06d}".format(int((pkt.time - int(pkt.time)) * 1_000_000)))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
+                    f'{datetime.fromtimestamp(int(pkt.time)).strftime("%Y-%m-%d %H:%M:%S")}.{int((pkt.time - int(pkt.time)) * 1_000_000):06d} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {pkt[ServerName].servername.decode("UTF-8")}')
             else:
                 print(
-                    f'{datetime.fromtimestamp(pkt.time).strftime("%Y-%m-%d %H:%M:%S.{:06d}".format(int((pkt.time - int(pkt.time)) * 1_000_000)))} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
+                    f'{datetime.fromtimestamp(int(pkt.time)).strftime("%Y-%m-%d %H:%M:%S")}.{int((pkt.time - int(pkt.time)) * 1_000_000):06d} TLS {TLS_VERSIONS[pkt[TLSClientHello].version]} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport}')
         elif pkt.haslayer(TCP) and pkt[TCP].payload and pkt.haslayer(Raw):
             tcp_payload = bytes(pkt[TCP].payload)
             if len(tcp_payload) > 10:
@@ -101,7 +101,7 @@ def display_single_packet(pkt):
                             sni_value = ext_val[5:].decode()
                         curr_byte = curr_byte + 4 + ext_len
                     print(
-                        f'{datetime.fromtimestamp(pkt.time).strftime("%Y-%m-%d %H:%M:%S.{:06d}".format(int((pkt.time - int(pkt.time)) * 1_000_000)))} {readable_version} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {sni_value}')
+                        f'{datetime.fromtimestamp(int(pkt.time)).strftime("%Y-%m-%d %H:%M:%S")}.{int((pkt.time - int(pkt.time)) * 1_000_000):06d} {readable_version} {pkt[IP].src}:{pkt[TCP].sport} -> {pkt[IP].dst}:{pkt[TCP].dport} {sni_value}')
 
 
 def display_packets(packet_list: list):
