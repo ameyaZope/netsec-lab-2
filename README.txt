@@ -114,8 +114,21 @@ This script is an ARP Cache Poisoning Detector that uses the Scapy library to mo
 
 sudo ./arpwatch.py -i eth0
 
+Starting ARP-Watch for arp-cache-poisoning detection
+[WARNING] 09/03/2024 20:29:46 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+[WARNING] 09/03/2024 20:30:50 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+[WARNING] 09/03/2024 20:31:51 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+[WARNING] 09/03/2024 20:32:59 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+[WARNING] 09/03/2024 20:34:03 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+[WARNING] 09/03/2024 20:35:07 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+[WARNING] 09/03/2024 20:35:55 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+[WARNING] 09/03/2024 20:36:50 ARP Cache Poisoning Detected ARP Changing from initialMac : 08:00:27:a8:83:ba newMac: 52:54:00:12:35:00 for ip: 10.0.2.1
+
+
 # [arpwatch.py] With Default Interface
 sudo ./arpwatch.py
+
+Output is the same as above
 
 Let me explain the attacker and victim situation.
 There is one attacker machine(ubuntu machine) and one victim machine (kali-linux machine).
