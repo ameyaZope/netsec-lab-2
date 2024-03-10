@@ -1,7 +1,7 @@
 Lab 2 : CSE 508 Network Security
 
 Packet Sniffer
-For better formatted instructions with sample images, please look at README.pdf.
+For better looking and easy on the eyes introduction with sample images, please look at README.pdf.
 This file is added because the requirement says an ASCII file.
 This is a basic packet sniffer made in accordance with lab 2 of CSE 508 Network Security Course. This Python script implements a simple packet sniffer specifically designed for monitoring HTTP and TLS traffic. It utilizes the Scapy library to capture packets over a specified network interface or from a pcap file. The script is capable of identifying and displaying information about HTTP requests (including method, host, and path) as well as details about TLS sessions (such as the version and server name, if available). Users can specify the network interface to monitor or a pcap file to read from via command-line arguments. Additionally, the script allows for the application of a Berkeley Packet Filter (BPF) expression to limit the captured traffic according to the user's needs. The program is structured to be user-friendly, offering help messages and usage instructions through its command-line interface.
 
@@ -9,14 +9,30 @@ Sample Usage and Sample Output
 [mysniffer.py] With Specified Network Interface
 sudo ./mysniffer.py -i eth0
 
+Sniffing interface en0
+2024-03-09 21:47:08.759546 TLS v1.0 172.31.66.216:53915 -> 172.253.63.99:443 www.google.com
+
 [mysniffer.py] With Specified PCAP file
 sudo ./mysniffer.py -r hw2.pcap
+reading from file hw2.pcap, link-type EN10MB (Ethernet), snapshot length 65535
+2013-01-12 22:30:49.032953 HTTP 192.168.0.200:40341 -> 87.98.246.8:80 pic.leech.it:80 GET /i/f166c/479246b0asttas.jpg
+2013-01-12 22:31:19.244125 HTTP 192.168.0.200:40630 -> 216.137.63.121:80 ecx.images-amazon.com:80 GET /images/I/41oZ1XsiOAL.
+2013-01-12 22:31:50.359908 HTTP 192.168.0.200:55528 -> 159.148.96.184:80 images4.byinter.net:80 GET /DSC442566.gif
+
 
 [mysniffer.py] With Default Interface (No interface and No pcap file provided)
 sudo ./mysniffer.py
 
+Sniffing interface en0
+2024-03-09 21:47:08.759546 TLS v1.0 172.31.66.216:53915 -> 172.253.63.99:443 www.google.com
+
+
 [mysniffer.py] BPF Filter
 sudo ./mysniffer.py -r hw2.pcap 'dst host 216.137.63.121'
+
+reading from file hw2.pcap, link-type EN10MB (Ethernet), snapshot length 65535
+2013-01-12 22:31:19.244125 HTTP 192.168.0.200:40630 -> 216.137.63.121:80 ecx.images-amazon.com:80 GET /images/I/41oZ1XsiOAL.
+
 
 Testing
 [mysniffer.py] Different Versions of TLS on standard port
