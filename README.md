@@ -5,7 +5,7 @@
 This is a basic packet sniffer made in accordance with lab 2 of CSE 508 Network Security Course. 
 
 ### Sample Usage and Sample Output
-#### [mysniffer.py] With Specified Network Interface
+#### \[mysniffer.py\] With Specified Network Interface
 
 ```bash
 sudo ./mysniffer.py -i eth0
@@ -14,29 +14,29 @@ sudo ./mysniffer.py -i eth0
 <img src="./mysniffer_sniff_interface.png" alt="mysniffer_sniff_interface.png">
 
 
-#### [mysniffer.py] With Specified PCAP file
+#### \[mysniffer.py\] With Specified PCAP file
 
 ```bash
 sudo ./mysniffer.py -r hw2.pcap
 ```
 <img src="./mysniffer_read_pcap_file.png" alt="mysniffer_read_pcap_file.png">
 
-#### [mysniffer.py] With Default Interface (No interface and No pcap file provided)
+#### \[mysniffer.py\] With Default Interface (No interface and No pcap file provided)
 
 <img src="./mysniffer_with_default_interface.png" alt="mysniffer_with_default_interface.png">
 
 
-#### [mysniffer.py] POST Requests
+#### \[mysniffer.py\] POST Requests
 
 <img src="./mysniffer_post_request.png" alt="mysniffer_post_request.png">
 
-#### [mysniffer.py] BPF Filter
+#### \[mysniffer.py\] BPF Filter
 
 <img src="./mysniffer_bpf_filter.png" alt="mysniffer_bpf_filter.png">
 
 
 ### Testing
-#### [mysniffer.py] Different Versions of TLS on standard port
+#### \[mysniffer.py\] Different Versions of TLS on standard port
 For testing on standard port on different versions of TLS, use the below curl commands
 
 ```bash
@@ -54,7 +54,7 @@ curl -X G--tlsv1.0 --tls-max 1.0 --ciphers DEFAULT@SECLEVEL=0 -vI https://www.go
 
 ```
 
-#### [mysniffer.py] Different Versions of TLS on non-standard port
+#### \[mysniffer.py\] Different Versions of TLS on non-standard port
 For testing on non-standard port of TLS, we used the https://portquiz.takao-tech.com website. 
 This website is running on https and supports multiple non-standard ports like 9001, 8080, 80, 8, 666, etc.
 I chose the non-standard port 9001 and different TLS versions for testing.
@@ -75,7 +75,7 @@ curl -X G--tlsv1.0 --tls-max 1.0 --ciphers DEFAULT@SECLEVEL=0 -vI https://portqu
 
 ```
 
-#### [mysniffer.py] Testing on Standard and Non-Standard Port for HTTP
+#### \[mysniffer.py\] Testing on Standard and Non-Standard Port for HTTP
 Testing on custom port can be done via website http://portquiz.net:8080/. 
 This website is running on http and supports multiple ports like 8080, 80, 8, 666, etc. 
 The following curl requests were made for testing http requests
@@ -124,7 +124,7 @@ openssl s_client -connect localhost:8443
 This is a simple arp cache poisoning detector written to work on kali linux and in accordance with lab-2
 for CSE 508 : Network Security
 
-#### [arpwatch.py] With Specified Interface
+#### \[arpwatch.py\] With Specified Interface
 
 ```bash
 sudo ./arpwatch.py -i eth0 
@@ -132,7 +132,7 @@ sudo ./arpwatch.py -i eth0
 
 <img src="./attacker_terminal_1.png" alt="attacker_terminal_1.png">
 
-#### [arpwatch.py] With Default Interface
+#### \[arpwatch.py\] With Default Interface
 
 <img src="./arpwatch_with_default_interface.png" alt="arpwatch_with_default_interface.png">
 
