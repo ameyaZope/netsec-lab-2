@@ -2,7 +2,7 @@
 
 
 ## Packet Sniffer
-This is a basic packet sniffer made in accordance with lab 2 of CSE 508 Network Security Course. 
+This is a basic packet sniffer made in accordance with lab 2 of CSE 508 Network Security Course. This Python script implements a simple packet sniffer specifically designed for monitoring HTTP and TLS traffic. It utilizes the Scapy library to capture packets over a specified network interface or from a pcap file. The script is capable of identifying and displaying information about HTTP requests (including method, host, and path) as well as details about TLS sessions (such as the version and server name, if available). Users can specify the network interface to monitor or a pcap file to read from via command-line arguments. Additionally, the script allows for the application of a Berkeley Packet Filter (BPF) expression to limit the captured traffic according to the user's needs. The program is structured to be user-friendly, offering help messages and usage instructions through its command-line interface.
 
 ### Sample Usage and Sample Output
 #### \[mysniffer.py\] With Specified Network Interface
@@ -121,8 +121,7 @@ openssl s_client -connect localhost:8443
 ```
 
 ## Arpwatch 
-This is a simple arp cache poisoning detector written to work on kali linux and in accordance with lab-2
-for CSE 508 : Network Security
+This script is an ARP Cache Poisoning Detector that uses the Scapy library to monitor ARP packets on a network interface, aiming to detect ARP spoofing attacks. It reads the ARP table from the system, listens for ARP responses, and alerts if it finds any discrepancies between the packet's source IP and MAC addresses compared to the initial ARP table entries. Users can specify a network interface for monitoring; otherwise, the script defaults to the system's primary interface. It's designed to be simple and user-friendly, providing basic command-line options for operation.
 
 #### \[arpwatch.py\] With Specified Interface
 
