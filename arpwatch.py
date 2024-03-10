@@ -35,10 +35,11 @@ def get_arp_table():
 class ArpWatch:
     def __init__(self, interface):
         self.interface = interface
+        self.arp_table = get_arp_table()
 
     def detect_arp_poisoning(self, pkt):
         if ARP in pkt and pkt[ARP].op == 2:  # who-has or is-at
-            for arp_entry in get_arp_table():
+            for arp_entry in self.arp_table:
                 if arp_entry['IP address'] == pkt[ARP].psrc and arp_entry['HW address'] != pkt[ARP].hwsrc:
                     return pkt.sprintf(f'[WARNING] {datetime.now().strftime("%d/%m/%Y %H:%M:%S")} ARP Cache Poisoning '
                                        'Detected ARP Changing from initialMac : ' + str(arp_entry['HW address'] +

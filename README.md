@@ -208,3 +208,5 @@ ping 8.8.8.8
 ```
 <img src="./victim_terminal_2.png" alt="victim_terminal_2.png">
 
+### Interesting Facts
+When reading the /proc/net/arp file , the call may block if the file is not updated.  I would highly advise against reading the file continuously for each packet. This is because updates to this file don't happen after every packet and if the file is not updated then the call to read the file will block your code.
