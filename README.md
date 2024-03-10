@@ -21,14 +21,18 @@ sudo ./mysniffer.py -r hw2.pcap
 ```
 <img src="./mysniffer_read_pcap_file.png" alt="mysniffer_read_pcap_file.png">
 
+#### [mysniffer.py] With Default Interface (No interface and No pcap file provided)
+
+<img src="./mysniffer_with_default_interface.png" alt="mysniffer_with_default_interface.png">
+
 
 #### [mysniffer.py] POST Requests
 
 <img src="./mysniffer_post_request.png" alt="mysniffer_post_request.png">
 
 #### [mysniffer.py] BPF Filter
-<img src="./mysniffer_bpf_filter.png" alt="mysniffer_bpf_filter.png">
 
+<img src="./mysniffer_bpf_filter.png" alt="mysniffer_bpf_filter.png">
 
 
 ### Testing
@@ -121,9 +125,16 @@ This is a simple arp cache poisoning detector written to work on kali linux and 
 for CSE 508 : Network Security
 
 #### [arpwatch.py] With Specified Interface
+
 ```bash
 sudo ./arpwatch.py -i eth0 
 ```
+
+<img src="./attacker_terminal_1.png" alt="attacker_terminal_1.png">
+
+#### [arpwatch.py] With Default Interface
+
+<img src="./arpwatch_with_default_interface.png" alt="arpwatch_with_default_interface.png">
 
 Let me explain the attacker and victim situation. 
 There is one attacker machine(ubuntu machine) and one victim machine (kali-linux machine). 
@@ -177,7 +188,7 @@ sudo systctl -w net.ipv4.ip_forward=1
 <img src="./attacker_terminal_3.png" alt="attacker_terminal_3.png">
 
 
-Victim will have 1 termainl open
+Victim will have 2 terminal open. One for running the arpwatch script. One for demo purposes
 
 ***Victim Terminal 1***
 
